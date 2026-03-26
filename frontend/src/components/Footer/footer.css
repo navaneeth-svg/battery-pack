@@ -1,0 +1,68 @@
+.footer {
+    padding: 1rem 0;
+    background-color: #0d0d0d;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+.footer_logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .footer_logo_img {
+    width: 40px;
+  }
+  
+  .social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    font-size: large;
+  }
+  
+  .social_link {
+    color: #ffffff;
+  }
+  
+  .social_link:hover {
+    color: #fa6400ea;
+  }
+  
+  
+  .email {
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .address {
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .formality{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+  .formality_link {
+    text-decoration: none;
+    color: #fa6400ea;
+    font-size: 0.9rem;
+  }
+  .Copyright {
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
