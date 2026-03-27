@@ -1011,7 +1011,7 @@ const BatteryConfig = () => {
           )}
         </>
       )}
-
+  
       <GhostLinks orderData={{
         numberOfCells: totalCells,
         pricePerCell: cellCondition === "Recycled cell" ? 1 : 1,
