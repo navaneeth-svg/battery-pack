@@ -520,17 +520,286 @@ def design_battery_pack():
 
 
 @app.route('/batteries/<path:endpoint>', methods=['GET', 'POST'])
-def batteries_stub(endpoint):
+def batteries_endpoint(endpoint):
     """
-    Stub endpoint for compatibility with main app's BatteryCellPlots
-    Returns empty data since this functionality is not needed for pack design
+    Generate synthetic plot data for cell variance visualization
+    Simulates capacity/IR degradation cycles based on current cell SOH/capacity
     """
-    print(f"ℹ️ Stub endpoint called: /batteries/{endpoint}")
-    return jsonify({
-        'success': True,
-        'message': 'This endpoint is not implemented in battery-pack-designer',
-        'data': {}
-    }), 200
+    try:
+        data = request.get_json()
+        modules_data = data.get('modules_data', {})
+        
+        print(f"📊 Generating plot data for endpoint: /batteries/{endpoint}")
+        print(f"   Modules received: {list(modules_data.keys())}")
+        
+        if endpoint == 'battery_variance_capacity_vs_cycle':
+            result = generate_capacity_variance_plots(modules_data)
+        elif endpoint == 'battery_variance_ir_vs_cycle':
+            result = generate_ir_variance_plots(modules_data)
+        elif endpoint == 'battery_variance_master_capacity_vs_cycle':
+            result = generate_master_capacity_plot(modules_data)
+        elif endpoint == 'battery_variance_master_ir_vs_cycle':
+            result = generate_master_ir_plot(modules_data)
+        else:
+            return jsonify({
+                'success': False,
+                'message': f'Unknown endpoint: {endpoint}'
+            }), 404
+        
+        print(f"✓ Generated plot data with {len(result)} modules")
+        return jsonify(result), 200
+        
+    except Exception as e:
+        print(f"❌ Error generating plot data: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+def generate_capacity_variance_plots(modules_data):
+    """
+    Generate synthetic capacity vs cycle plots for each module
+    Shows realistic degradation curves based on current cell SOH
+    """
+    result = {}
+    
+    for module_name, cells in modules_data.items():
+        if not cells:
+            continue
+            
+        # Generate cycle data (0 to 1000 cycles)
+        cycles = list(range(0, 1001, 50))  # Every 50 cycles
+        
+        # Create traces for each cell in the module
+        traces = []
+        for idx, cell in enumerate(cells):
+            soh = cell.get('soh', 95)
+            
+            # Calculate initial capacity from SOH (assuming 5Ah nominal)
+            initial_capacity = 5000 * (soh / 100)
+            
+            # Simulate degradation curve (exponential decay)
+            # Better cells (higher SOH) degrade slower
+            degradation_rate = 0.0001 * (100 - soh) / 10  # Slower for higher SOH
+            
+            capacity_values = []
+            for cycle in cycles:
+                # Exponential decay with noise
+                degradation = np.exp(-degradation_rate * cycle)
+                noise = np.random.normal(0, 10)  # ±10 mAh noise
+                capacity = initial_capacity * degradation + noise
+                capacity_values.append(max(capacity, 0))  # Don't go negative
+            
+            trace = {
+                'x': cycles,
+                'y': capacity_values,
+                'type': 'scatter',
+                'mode': 'lines+markers',
+                'name': f'Cell {idx + 1} (SOH: {soh:.1f}%)',
+                'line': {'width': 2},
+                'marker': {'size': 4}
+            }
+            traces.append(trace)
+        
+        # Create plotly layout
+        layout = {
+            'title': f'{module_name} - Capacity Variance',
+            'xaxis': {'title': 'Cycle Number', 'gridcolor': '#444'},
+            'yaxis': {'title': 'Capacity (mAh)', 'gridcolor': '#444'},
+            'plot_bgcolor': '#1a1a1a',
+            'paper_bgcolor': '#111',
+            'font': {'color': '#ffffff', 'family': 'Bai Jamjuree, sans-serif'},
+            'showlegend': True,
+            'legend': {'x': 0.02, 'y': 0.98, 'bgcolor': 'rgba(0,0,0,0.5)'},
+            'hovermode': 'closest'
+        }
+        
+        result[module_name] = {
+            'data': traces,
+            'layout': layout,
+            'config': {'displayModeBar': True, 'responsive': True}
+        }
+    
+    return result
+
+
+def generate_ir_variance_plots(modules_data):
+    """
+    Generate synthetic IR vs cycle plots for each module
+    Shows realistic IR increase over cycles
+    """
+    result = {}
+    
+    for module_name, cells in modules_data.items():
+        if not cells:
+            continue
+            
+        cycles = list(range(0, 1001, 50))
+        
+        traces = []
+        for idx, cell in enumerate(cells):
+            soh = cell.get('soh', 95)
+            
+            # Estimate initial IR from SOH (lower SOH = higher IR)
+            # Good cells: 20-40 mΩ, degraded cells: 50-100 mΩ
+            initial_ir = 20 + (100 - soh) * 0.8
+            
+            # IR increases exponentially with cycling
+            growth_rate = 0.0002 * (100 - soh) / 10
+            
+            ir_values = []
+            for cycle in cycles:
+                growth = np.exp(growth_rate * cycle)
+                noise = np.random.normal(0, 2)  # ±2 mΩ noise
+                ir = initial_ir * growth + noise
+                ir_values.append(max(ir, 0))
+            
+            trace = {
+                'x': cycles,
+                'y': ir_values,
+                'type': 'scatter',
+                'mode': 'lines+markers',
+                'name': f'Cell {idx + 1} (SOH: {soh:.1f}%)',
+                'line': {'width': 2},
+                'marker': {'size': 4}
+            }
+            traces.append(trace)
+        
+        layout = {
+            'title': f'{module_name} - IR Variance',
+            'xaxis': {'title': 'Cycle Number', 'gridcolor': '#444'},
+            'yaxis': {'title': 'Internal Resistance (mΩ)', 'gridcolor': '#444'},
+            'plot_bgcolor': '#1a1a1a',
+            'paper_bgcolor': '#111',
+            'font': {'color': '#ffffff', 'family': 'Bai Jamjuree, sans-serif'},
+            'showlegend': True,
+            'legend': {'x': 0.02, 'y': 0.98, 'bgcolor': 'rgba(0,0,0,0.5)'},
+            'hovermode': 'closest'
+        }
+        
+        result[module_name] = {
+            'data': traces,
+            'layout': layout,
+            'config': {'displayModeBar': True, 'responsive': True}
+        }
+    
+    return result
+
+
+def generate_master_capacity_plot(modules_data):
+    """
+    Generate master plot showing all modules' capacity variance on one chart
+    """
+    cycles = list(range(0, 1001, 50))
+    traces = []
+    
+    colors = ['#e8442d', '#ff851b', '#ffc107', '#4caf50', '#2196f3', '#9c27b0', '#f44336', '#00bcd4', '#ff9800']
+    
+    for module_idx, (module_name, cells) in enumerate(modules_data.items()):
+        if not cells:
+            continue
+            
+        # Calculate average capacity for this module
+        avg_capacities = []
+        for cycle_idx, cycle in enumerate(cycles):
+            module_capacity_at_cycle = []
+            for cell in cells:
+                soh = cell.get('soh', 95)
+                initial_capacity = 5000 * (soh / 100)
+                degradation_rate = 0.0001 * (100 - soh) / 10
+                degradation = np.exp(-degradation_rate * cycle)
+                capacity = initial_capacity * degradation
+                module_capacity_at_cycle.append(capacity)
+            
+            avg_capacities.append(np.mean(module_capacity_at_cycle))
+        
+        trace = {
+            'x': cycles,
+            'y': avg_capacities,
+            'type': 'scatter',
+            'mode': 'lines+markers',
+            'name': module_name,
+            'line': {'width': 3, 'color': colors[module_idx % len(colors)]},
+            'marker': {'size': 6}
+        }
+        traces.append(trace)
+    
+    layout = {
+        'title': 'Master Capacity vs Cycle - All Modules',
+        'xaxis': {'title': 'Cycle Number', 'gridcolor': '#444'},
+        'yaxis': {'title': 'Average Capacity (mAh)', 'gridcolor': '#444'},
+        'plot_bgcolor': '#1a1a1a',
+        'paper_bgcolor': '#111',
+        'font': {'color': '#ffffff', 'family': 'Bai Jamjuree, sans-serif'},
+        'showlegend': True,
+        'legend': {'x': 0.02, 'y': 0.98, 'bgcolor': 'rgba(0,0,0,0.5)'},
+        'hovermode': 'closest'
+    }
+    
+    return {
+        'data': traces,
+        'layout': layout,
+        'config': {'displayModeBar': True, 'responsive': True}
+    }
+
+
+def generate_master_ir_plot(modules_data):
+    """
+    Generate master plot showing all modules' IR variance on one chart
+    """
+    cycles = list(range(0, 1001, 50))
+    traces = []
+    
+    colors = ['#e8442d', '#ff851b', '#ffc107', '#4caf50', '#2196f3', '#9c27b0', '#f44336', '#00bcd4', '#ff9800']
+    
+    for module_idx, (module_name, cells) in enumerate(modules_data.items()):
+        if not cells:
+            continue
+            
+        avg_irs = []
+        for cycle_idx, cycle in enumerate(cycles):
+            module_ir_at_cycle = []
+            for cell in cells:
+                soh = cell.get('soh', 95)
+                initial_ir = 20 + (100 - soh) * 0.8
+                growth_rate = 0.0002 * (100 - soh) / 10
+                growth = np.exp(growth_rate * cycle)
+                ir = initial_ir * growth
+                module_ir_at_cycle.append(ir)
+            
+            avg_irs.append(np.mean(module_ir_at_cycle))
+        
+        trace = {
+            'x': cycles,
+            'y': avg_irs,
+            'type': 'scatter',
+            'mode': 'lines+markers',
+            'name': module_name,
+            'line': {'width': 3, 'color': colors[module_idx % len(colors)]},
+            'marker': {'size': 6}
+        }
+        traces.append(trace)
+    
+    layout = {
+        'title': 'Master IR vs Cycle - All Modules',
+        'xaxis': {'title': 'Cycle Number', 'gridcolor': '#444'},
+        'yaxis': {'title': 'Average Internal Resistance (mΩ)', 'gridcolor': '#444'},
+        'plot_bgcolor': '#1a1a1a',
+        'paper_bgcolor': '#111',
+        'font': {'color': '#ffffff', 'family': 'Bai Jamjuree, sans-serif'},
+        'showlegend': True,
+        'legend': {'x': 0.02, 'y': 0.98, 'bgcolor': 'rgba(0,0,0,0.5)'},
+        'hovermode': 'closest'
+    }
+    
+    return {
+        'data': traces,
+        'layout': layout,
+        'config': {'displayModeBar': True, 'responsive': True}
+    }
 
 
 if __name__ == '__main__':
@@ -539,6 +808,9 @@ if __name__ == '__main__':
     print("   - GET  /health")
     print("   - GET  /fetch-inventory")
     print("   - POST /design-battery-pack")
-    print("   - *    /batteries/* (stub for compatibility)")
+    print("   - POST /batteries/battery_variance_capacity_vs_cycle")
+    print("   - POST /batteries/battery_variance_ir_vs_cycle")
+    print("   - POST /batteries/battery_variance_master_capacity_vs_cycle")
+    print("   - POST /batteries/battery_variance_master_ir_vs_cycle")
     print(f"🔗 VPS Storage: {VPS_STORAGE_URL}")
     app.run(host='0.0.0.0', port=5000, debug=True)
