@@ -57,13 +57,13 @@ const PackComposition = ({ packDesignData }) => {
   }
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: '#333' }}>
+    <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', p: 0 }}>
+      {/* <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: '#333' }}>
         Pack Composition by Capacity
       </Typography>
       <Typography variant="body2" sx={{ mb: 3, color: '#666', textAlign: 'center' }}>
         Distribution of {chartData.totalCells || 0} cells selected for the optimized pack design
-      </Typography>
+      </Typography> */}
       <Plot
         data={[
           {
@@ -74,7 +74,7 @@ const PackComposition = ({ packDesignData }) => {
               color: '#4CAF50',
               line: {
                 color: '#388E3C',
-                width: 2
+                width: 1
               }
             },
             text: chartData.counts.map(c => c.toString()),
@@ -83,28 +83,24 @@ const PackComposition = ({ packDesignData }) => {
           }
         ]}
         layout={{
+          autosize: true,
           xaxis: {
             title: 'Capacity Range (mAh)',
-            titlefont: { size: 14, family: 'Bai Jamjuree, sans-serif', weight: 700 },
-            tickfont: { size: 12 }
+            titlefont: { size: 12, family: 'Bai Jamjuree, sans-serif' },
+            tickfont: { size: 10 }
           },
           yaxis: {
             title: 'Number of Cells',
-            titlefont: { size: 14, family: 'Bai Jamjuree, sans-serif', weight: 700 },
-            tickfont: { size: 12 }
+            titlefont: { size: 12, family: 'Bai Jamjuree, sans-serif' },
+            tickfont: { size: 10 }
           },
-          margin: { t: 40, r: 40, b: 80, l: 60 },
-          plot_bgcolor: '#f5f5f5',
-          paper_bgcolor: '#ffffff',
-          height: 400,
-          width: 800,
-          showlegend: false
+          margin: { t: 20, r: 20, b: 60, l: 50 },
+          plot_bgcolor: '#fff',
+          paper_bgcolor: 'transparent',
         }}
-        config={{
-          displayModeBar: true,
-          displaylogo: false,
-          modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d']
-        }}
+        useResizeHandler={true}
+        style={{ width: "100%", height: "400px" }}
+        config={{ responsive: true, displayModeBar: false }}
       />
     </Box>
   );

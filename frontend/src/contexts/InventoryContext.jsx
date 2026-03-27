@@ -21,18 +21,27 @@ export const InventoryProvider = ({ children }) => {
   const [lastProcessedFile, setLastProcessedFile] = useState(null);
 
   // Load from IndexedDB on mount
-  // REPLACE the existing useEffect for loading with:
   useEffect(() => {
     const loadData = async () => {
       try {
-        const savedData = await loadFromIndexedDB();
-        if (savedData) {
-          setTrainingItems(savedData.trainingItems || []);
-          setPredictionItems(savedData.predictionItems || []);
-          setLastProcessedFile(savedData.lastProcessedFile || null);
-        }
+        // Load from both stores
+        const [trainingData, predictionData] = await Promise.all([
+          loadFromIndexedDB('training').catch(() => []),
+          loadFromIndexedDB('predictions').catch(() => [])
+        ]);
+        
+        setTrainingItems(trainingData || []);
+        setPredictionItems(predictionData || []);
+        
+        console.log('📦 Loaded from IndexedDB:', {
+          training: trainingData?.length || 0,
+          predictions: predictionData?.length || 0
+        });
       } catch (error) {
-        console.error('Failed to load inventory:', error);
+        console.error('Error loading from IndexedDB:', error);
+        // Initialize with empty arrays if loading fails
+        setTrainingItems([]);
+        setPredictionItems([]);
       } finally {
         setIsLoading(false);
       }
@@ -43,16 +52,35 @@ export const InventoryProvider = ({ children }) => {
   // Save to IndexedDB whenever items change
   useEffect(() => {
     if (!isLoading) {
-      const dataToSave = {
-        trainingItems,
-        predictionItems,
-        lastProcessedFile
+      // Save items individually to their respective stores
+      const saveData = async () => {
+        try {
+          // Save training items
+          for (const item of trainingItems) {
+            if (item.id) {
+              await saveToIndexedDB('training', item);
+            }
+          }
+          
+          // Save prediction items
+          for (const item of predictionItems) {
+            if (item.id) {
+              await saveToIndexedDB('predictions', item);
+            }
+          }
+          
+          console.log('💾 Saved to IndexedDB:', {
+            training: trainingItems.length,
+            predictions: predictionItems.length
+          });
+        } catch (error) {
+          console.error('Failed to save inventory:', error);
+        }
       };
-      saveToIndexedDB(dataToSave).catch(error => {
-        console.error('Failed to save inventory:', error);
-      });
+      
+      saveData();
     }
-  }, [trainingItems, predictionItems, isLoading, lastProcessedFile]);
+  }, [trainingItems, predictionItems, isLoading]);
 
   // Helper function to get random cell image
   const getRandomCellImage = () => {

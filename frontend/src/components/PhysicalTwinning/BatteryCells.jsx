@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./dummy.css";
 import { ConfigCells } from "./ConfigCells";
+import { Tooltip, IconButton, Typography, Box, Paper, Grid, Alert } from "@mui/material";
+import { ViewCompact, ViewModule, InfoOutlined } from "@mui/icons-material";
 
 export const BatteryCells = ({
   cellsData,
@@ -18,6 +20,7 @@ export const BatteryCells = ({
 }) => {
   const [cells, setCells] = useState([]);
   const [modules, setModules] = useState({});
+  const [isCompact, setIsCompact] = useState(false);
 
   useEffect(() => {
     // If cellsData is already provided (from BatteryProcure), use it directly
@@ -75,198 +78,160 @@ export const BatteryCells = ({
       return '#f44336'; // Red
     };
 
+    const LegendItem = ({ color, label }) => (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ width: 14, height: 14, bgcolor: color, borderRadius: '2px', border: '1px solid rgba(255,255,255,0.2)' }} />
+        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '11px' }}>{label}</Typography>
+      </Box>
+    );
+
     return (
       <div className="flex flex-col items-center w-full gap-6 p-4">
         {/* Warnings */}
         {warnings && warnings.length > 0 && (
           <div className="w-full max-w-6xl">
             {warnings.map((warning, idx) => (
-              <div key={idx} className="bg-yellow-900 border-2 border-yellow-500 text-white p-3 rounded mb-2 font-semibold">
+              <Alert key={idx} severity="warning" variant="filled" sx={{ mb: 2, bgcolor: '#ff9800' }}>
                 {warning}
-              </div>
+              </Alert>
             ))}
           </div>
         )}
 
-        {!warnings || warnings.length === 0 && (
-          <div className="bg-green-900 border-2 border-green-500 text-white p-3 rounded w-full max-w-6xl font-semibold">
-            ✓ Pack design optimal - no warnings detected
+        {(!warnings || warnings.length === 0) && (
+          <div className="w-full max-w-6xl">
+            <Alert severity="success" variant="filled" sx={{ bgcolor: '#4caf50' }}>
+              ✓ Pack design optimal - no warnings detected
+            </Alert>
           </div>
         )}
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-6xl">
-          <div className="bg-black border-2 border-red-500 p-4 rounded text-center">
-            <p className="text-white text-sm mb-1">Configuration</p>
-            <p className="text-red-500 text-xl font-bold">{statistics.configuration}</p>
-            <p className="text-gray-400 text-xs">{statistics.total_cells} cells</p>
-          </div>
-          
-          <div className="bg-black border-2 border-red-500 p-4 rounded text-center">
-            <p className="text-white text-sm mb-1">Pack Capacity</p>
-            <p className="text-red-500 text-xl font-bold">{statistics.pack_capacity_ah?.toFixed(2)} Ah</p>
-            <p className="text-gray-400 text-xs">{statistics.pack_capacity_mah?.toFixed(0)} mAh</p>
-          </div>
-          
-          <div className="bg-black border-2 border-red-500 p-4 rounded text-center">
-            <p className="text-white text-sm mb-1">Pack Energy</p>
-            <p className="text-red-500 text-xl font-bold">{statistics.energy_wh?.toFixed(1)} Wh</p>
-            <p className="text-gray-400 text-xs">{statistics.nominal_voltage?.toFixed(1)} V</p>
-          </div>
-          
-          <div className="bg-black border-2 border-red-500 p-4 rounded text-center">
-            <p className="text-white text-sm mb-1">Avg SOH</p>
-            <p className="text-red-500 text-xl font-bold">{statistics.avg_soh?.toFixed(1)}%</p>
-            <p className="text-gray-400 text-xs">IR: {statistics.avg_ir?.toFixed(1)} Ω</p>
-          </div>
-        </div>
+        {/* Improved Matrix Section */}
+        <div className="w-full max-w-7xl">
+          <Paper elevation={4} sx={{ 
+            p: { xs: 2, md: 4 }, 
+            bgcolor: '#1a1a1a', 
+            borderRadius: '12px',
+            border: '1px solid #333'
+          }}>
+            {/* Toolbar */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
+              <Box>
+                <Typography variant="h5" sx={{ color: '#fff', fontWeight: 700 }}>
+                  {numSeries}S × {numParallel}P Pack Matrix
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                  Optimized Cell Distribution (Capacity Balanced)
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                  <LegendItem color="#4caf50" label=">4.5Ah" />
+                  <LegendItem color="#8bc34a" label=">4.3Ah" />
+                  <LegendItem color="#ffc107" label=">4.2Ah" />
+                  <LegendItem color="#ff9800" label=">4.1Ah" />
+                  <LegendItem color="#f44336" label="<4.1Ah" />
+                </Box>
+                <Box sx={{ borderLeft: '1px solid #444', pl: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Tooltip title={isCompact ? "Switch to Detailed View" : "Switch to Compact View"}>
+                    <IconButton onClick={() => setIsCompact(!isCompact)} sx={{ color: '#e8442d' }}>
+                      {isCompact ? <ViewModule /> : <ViewCompact />}
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </Box>
+            </Box>
 
-        {/* Pack Matrix Title */}
-        <div className="bg-red-100 border-2 border-red-500 p-3 rounded w-full max-w-6xl text-center">
-          <h2 className="text-red-600 text-xl font-bold">
-            {numSeries}S × {numParallel}P BATTERY PACK - OPTIMIZED CELL DISTRIBUTION
-          </h2>
-        </div>
+            {/* Matrix Grid */}
+            <div className="overflow-x-auto">
+              <div className="flex flex-col gap-3 min-w-max pb-4">
+                {Array.from({ length: numParallel }).map((_, parallelIdx) => (
+                  <div key={`parallel-${parallelIdx}`} className="flex gap-2 items-center">
+                    <Box sx={{ 
+                      width: 80, 
+                      height: isCompact ? 32 : 80,
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      bgcolor: '#2196f3',
+                      color: '#fff',
+                      fontWeight: 700,
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                      flexShrink: 0
+                    }}>
+                      P-{parallelIdx + 1}
+                    </Box>
 
-        {/* Matrix Grid - Unified Layout: All cells in one container */}
-        <div className="overflow-x-auto w-full max-w-7xl">
-          <div className="border-4 border-red-500 rounded-lg p-6 bg-gradient-to-br from-gray-900 to-gray-800">
-            {/* Title */}
-            <div className="text-center mb-6">
-              <h2 className="text-white text-2xl font-bold mb-2">
-                {numSeries}S × {numParallel}P Battery Pack Matrix
-              </h2>
-              <p className="text-gray-300 text-sm">
-                Series (Vertical) × Parallel (Horizontal) Configuration
-              </p>
-            </div>
+                    <div className="flex gap-2">
+                      {pack_matrix.map((seriesString, seriesIdx) => {
+                        const cell = seriesString[parallelIdx];
+                        const cap = cell ? (cell.capacity || cell.predicted_capacity) : 0;
+                        const bgColor = cell ? getCapacityColor(cap) : '#333';
+                        
+                        return (
+                          <Tooltip 
+                            key={`cell-${seriesIdx}-${parallelIdx}`}
+                            title={cell ? `UID: ${cell.uid} | SOH: ${cell.soh || cell.predicted_soh}% | IR: ${cell.ir || 0}Ω` : "Empty Slot"}
+                            arrow
+                          >
+                            <Box sx={{
+                              width: isCompact ? 32 : 100,
+                              height: isCompact ? 32 : 80,
+                              bgcolor: bgColor,
+                              borderRadius: '4px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              border: '1px solid rgba(255,255,255,0.1)',
+                              transition: 'all 0.2s',
+                              '&:hover': {
+                                transform: 'scale(1.05)',
+                                zIndex: 10,
+                                boxShadow: '0 0 15px ' + bgColor
+                              }
+                            }}>
+                              {!isCompact && cell && (
+                                <>
+                                  <Typography sx={{ color: '#000', fontSize: '10px', fontWeight: 800 }}>{cap.toFixed(0)}</Typography>
+                                  <Typography sx={{ color: '#000', fontSize: '10px', opacity: 0.8 }}>mAh</Typography>
+                                  <Typography sx={{ color: '#000', fontSize: '9px', fontWeight: 600, mt: 0.5 }}>S:{seriesIdx + 1}</Typography>
+                                </>
+                              )}
+                              {isCompact && cell && (
+                                <Typography sx={{ color: '#000', fontSize: '9px', fontWeight: 900 }}>{seriesIdx + 1}</Typography>
+                              )}
+                            </Box>
+                          </Tooltip>
+                        );
+                      })}
+                    </div>
 
-            {/* Battery Pack Grid */}
-            <div className="flex flex-col gap-4">
-              {/* Loop through each parallel string (rows) - now labeled as Series */}
-              {Array.from({ length: numParallel }).map((_, parallelIdx) => (
-                <div key={`parallel-${parallelIdx}`} className="flex gap-2 items-center">
-                  {/* Series String Label (was Parallel) */}
-                  <div className="w-20 flex flex-col items-center justify-center bg-blue-500 text-white font-bold text-sm border-2 border-black rounded p-2 flex-shrink-0">
-                    <div>S{parallelIdx + 1}</div>
-                    <div className="text-xs mt-1">{column_totals.capacity[parallelIdx]?.toFixed(0)} mAh</div>
+                    {/* Column Total */}
+                    <Box sx={{ 
+                      width: 70, 
+                      height: isCompact ? 32 : 80,
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      color: '#fff',
+                      fontWeight: 700,
+                      fontSize: '12px',
+                      flexShrink: 0,
+                      borderLeft: '2px dashed #444',
+                      ml: 1
+                    }}>
+                      {column_totals[parallelIdx]?.toFixed(2)} Ah
+                    </Box>
                   </div>
-
-                  {/* Parallel cells in this series string (horizontal flow) - now labeled as Parallel */}
-                  <div className="flex gap-2 items-center flex-1 overflow-x-auto">
-                    {pack_matrix.map((row, seriesIdx) => {
-                      const cell = row[parallelIdx];
-                      
-                      return (
-                        <React.Fragment key={`series-${seriesIdx}`}>
-                          {/* Cell */}
-                          <div className="relative">
-                            {!cell ? (
-                              <div className="w-24 h-24 bg-gray-300 border-2 border-dashed border-gray-500 rounded flex items-center justify-center flex-shrink-0">
-                                <span className="text-xs text-gray-500">Empty</span>
-                              </div>
-                            ) : (
-                              <div 
-                                className="w-24 h-24 border-2 border-black rounded flex flex-col items-center justify-center gap-0.5 cursor-pointer hover:scale-105 transition-transform flex-shrink-0 relative"
-                                style={{ backgroundColor: getCapacityColor(parseFloat(cell.predicted_capacity || cell.capacity || 0)) }}
-                                title={`UID: ${cell.uid || cell.cellId || cell.id}\nCapacity: ${parseFloat(cell.predicted_capacity || cell.capacity || 0).toFixed(0)} mAh\nSOH: ${parseFloat(cell.predicted_soh || cell.soh || 0).toFixed(2)}%\nIR: ${parseFloat(cell.ir || 0).toFixed(2)} Ω`}
-                                onClick={() => window.open(`/#/batteryscope-c/cell-health-certificate?uid=${cell.uid || cell.cellId || cell.id}`, "_blank")}
-                              >
-                                {/* Parallel label on top of first row cells */}
-                                {parallelIdx === 0 && (
-                                  <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-black font-bold text-xs border border-black rounded px-2 py-0.5 whitespace-nowrap">
-                                    P{seriesIdx + 1} (3.7V)
-                                  </div>
-                                )}
-                                
-                                <span className="text-xs font-semibold text-black truncate w-full text-center px-1">{cell.uid || cell.cellId || cell.id || 'N/A'}</span>
-                                <span className="text-xs font-bold text-black">{parseFloat(cell.predicted_capacity || cell.capacity || 0).toFixed(0)}</span>
-                                <span className="text-xs bg-white px-1.5 py-0.5 rounded border border-black font-bold">
-                                  {parseFloat(cell.predicted_soh || cell.soh || 0).toFixed(2)}%
-                                </span>
-                                <span className="text-xs text-black font-semibold">
-                                  IR: {parseFloat(cell.ir || 0).toFixed(1)}Ω
-                                </span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Connection Symbol */}
-                          {seriesIdx < pack_matrix.length - 1 && (
-                            <div className="flex items-center justify-center text-red-500 text-xl font-bold flex-shrink-0">
-                              ━
-                            </div>
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Column Totals - Shows combined capacity of series cells at each parallel position */}
-            <div className="flex gap-2 items-center mt-6">
-              <div className="w-20 flex-shrink-0"></div> {/* Spacer for S label alignment */}
-              <div className="flex gap-2 items-center flex-1">
-                {pack_matrix.map((row, seriesIdx) => {
-                  // Calculate total capacity for this parallel position (column)
-                  const columnCapacity = Array.from({ length: numParallel }).reduce((sum, _, parallelIdx) => {
-                    const cell = pack_matrix[seriesIdx][parallelIdx];
-                    return sum + parseFloat(cell?.predicted_capacity || cell?.capacity || 0);
-                  }, 0);
-
-                  return (
-                    <React.Fragment key={`col-total-${seriesIdx}`}>
-                      <div className="w-24 flex flex-col items-center justify-center bg-green-600 text-white font-bold text-xs border-2 border-black rounded p-2 flex-shrink-0">
-                        <div>P{seriesIdx + 1} Total</div>
-                        <div className="mt-1">{columnCapacity.toFixed(0)} mAh</div>
-                      </div>
-                      {seriesIdx < pack_matrix.length - 1 && (
-                        <div className="w-7 flex-shrink-0"></div>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
+                ))}
               </div>
             </div>
-
-            {/* Grand Total */}
-            <div className="mt-6 text-center">
-              <div className="inline-block bg-yellow-400 border-3 border-black rounded-lg px-6 py-3">
-                <p className="text-black font-bold text-lg">
-                  Total Pack Capacity: {column_totals.capacity.reduce((sum, cap) => sum + cap, 0).toFixed(0)} mAh
-                </p>
-                <p className="text-black text-sm mt-1">
-                  ({numSeries} Series × {numParallel} Parallel = {numSeries * numParallel} cells)
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Legend */}
-        <div className="flex flex-wrap gap-4 justify-center w-full max-w-6xl">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-green-500 border border-black"></div>
-            <span className="text-black text-sm">Excellent (&gt;4500mAh)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-lime-400 border border-black"></div>
-            <span className="text-black text-sm">Good (4300-4500)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-yellow-400 border border-black"></div>
-            <span className="text-black text-sm">Fair (4200-4300)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-orange-500 border border-black"></div>
-            <span className="text-black text-sm">Caution (4100-4200)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-red-500 border border-black"></div>
-            <span className="text-black text-sm">Warning (&lt;4100)</span>
-          </div>
+          </Paper>
         </div>
       </div>
     );

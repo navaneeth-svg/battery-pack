@@ -1,0 +1,159 @@
+Battery Pack Designer - Project Summary
+📦 What It Is
+Battery Pack Designer is a standalone package extracted from the main ThinkClock BatteryScope project that focuses exclusively on one feature: designing optimal battery packs from a library of characterized battery cells.
+
+Created on March 26, 2026, it's a self-contained application split into:
+
+Frontend: React/Vite + MUI component library (13 React components)
+Backend: Python Flask API with smart cell distribution algorithm
+Location: battery-pack-designer folder within the main project
+🎯 What It Does
+Core Functionality
+Designs optimal battery packs by:
+
+Fetches Cell Inventory from VPS storage (/optv1 container)
+
+Pulls characterized cells from training_daq_* or prediction_daq_* files
+Enriches with training_metadata.json (SOH, capacity predictions)
+Only includes cells with valid SOH and capacity data
+Smart Cell Selection Algorithm
+
+Calculates composite score for each cell:
+Capacity (40% weight)
+SOH/State of Health (40% weight)
+Internal Resistance/IR (20% weight, inverse)
+Groups cells by score (bins of 5 points)
+Sorts cells from best to worst
+Optimal Pack Distribution
+
+Distributes cells using round-robin algorithm
+Balances parallel strings to avoid weak links
+Fills pack in series/parallel configuration (e.g., 7S22P)
+Handles partial filling if insufficient cells available
+Visualization & Analytics
+
+Pack Matrix View: Visual grid showing cell placement
+Pack Composition: Statistical breakdown per parallel string
+Inventory Distribution: Histogram of capacity ranges
+Cell Performance Plots: Individual and master plots
+Warnings: Alerts for capacity/IR mismatches
+🔍 How It's Different from Root Project
+Aspect	Root Project (BatteryScope)	Battery Pack Designer (Standalone)
+Purpose	Full battery testing & analysis platform	Single-purpose: Pack design only
+Scope	Cell characterization, SOH prediction, data capture, ML inference, hardware integration	Cell selection & pack configuration only
+Hardware	Requires PicoScope, VARTECH, UTL8212, PocketVNA	No hardware - pure software
+Data Source	Captures raw data from physical devices	Reads existing characterized cells from VPS
+User Flow	Test cell → Predict SOH → Store data → View results	Select cells → Configure pack → Visualize→ Export
+Target Deployment	Desktop app (Electron) + local backend	Web app to optv1 VPS (isolated environment)
+Dependencies	Heavy (Electron, PyInstaller, device drivers, ML models)	Lightweight (React, Flask, Axios)
+Authentication	Multi-user with VPS container routing	Same auth system (bcrypt + JWT)
+VPS Container	Multiple containers (/lico, /celloop, /minimines, /demo)	Single container (/optv1)
+Complexity	~10,000+ lines across frontend/backend	~2,000 lines total
+Use Case	Battery testing laboratory	Pack design consultancy or cell procurement service
+🏗️ Architecture Differences
+Root Project Architecture
+Battery Pack Designer Architecture
+🎨 Key Components
+Frontend (13 React Components)
+index.jsx - Main entry point, wraps BatteryConfig
+BatteryConfig.jsx - Core UI (200+ lines) - voltage, capacity, series/parallel inputs
+ConfigCells.jsx - Cell configuration logic
+ProcureCells.jsx - Cell procurement/selection interface
+BatteryCells.jsx - Display available cells from inventory
+DynamicBoxes.jsx - Visual pack representation (grid of cells)
+PackComposition.jsx - Statistical breakdown per parallel string
+InventoryDistribution.jsx - Histogram of cell capacities
+BatteryCellPlots.jsx - Individual cell performance charts
+BatteryCellMasterPlot.jsx - Master visualization with all cells
+GhostLinks.jsx - Navigation helpers
+Backend (1 Flask API)
+pack_designer_api.py (450+ lines)
+/health - Health check endpoint
+/fetch-inventory - Get cells from VPS storage
+/design-battery-pack - Run pack optimization algorithm
+Metadata parsing from filenames
+Composite scoring algorithm
+Round-robin distribution logic
+🚀 Deployment Strategy
+Root Project
+Built as desktop application (Electron + PyInstaller)
+Backend compiled to .exe executable
+Installer via electron-builder
+Installed on customer machines
+Requires hardware connections
+Battery Pack Designer
+Deploy as standalone web app on optv1 VPS
+
+Two deployment options:
+
+Standalone: New Vite app + separate Flask backend (recommended)
+Integrated: Full main app deployed to optv1, show only pack designer routes
+Target: optv1 VPS at https://dev2.thinkclock.com/optv1
+
+No hardware requirements
+
+Accessible via web browser
+
+Suitable for consultancy services or SaaS
+
+🔐 Authentication & Storage
+Shared with Root Project
+✅ Same bcrypt authentication system
+✅ Same JWT token-based sessions
+✅ Same credentials.py structure
+✅ Can reuse user accounts
+Different Storage Model
+Root Project: Each user gets dedicated VPS container
+Pack Designer: Uses single /optv1 container for all users
+Pack Designer reads cells from /optv1/api/raw-files
+Searches for training_daq_* or prediction_daq_* files
+💡 Use Cases
+Root Project (BatteryScope)
+Battery testing laboratories
+R&D departments characterizing new cells
+Quality control in manufacturing
+Research institutions studying battery degradation
+Customers who own physical hardware
+Battery Pack Designer
+Pack design consultancy - Customers send specs, you design pack
+Cell procurement service - Select best cells from inventory for customer needs
+Online pack configuration tool - Customer portal for pack quotes
+Educational tool - Demonstrate pack design principles
+Sales tool - Show potential customers what packs you can build
+Customers without hardware who just need designs
+📊 File Sizes & Complexity
+Metric	Root Project	Pack Designer
+Lines of Code	~10,000+	~2,000
+Components	50+ React components	13 React components
+API Endpoints	30+ routes	3 routes
+Dependencies (Frontend)	40+ packages	10 packages
+Dependencies (Backend)	25+ packages	5 packages
+Hardware Drivers	4 DLLs (libusb, PocketVNA API)	None
+ML Models	5+ .pkl files	None
+Build Size	~500MB (with Electron)	~50MB
+✅ Current Status
+The battery-pack-designer package is complete and ready for deployment:
+
+✅ All frontend components extracted (13 files)
+✅ Backend API created with full algorithm (450+ lines)
+✅ Documentation complete (README, DEPLOYMENT, FILE_MANIFEST)
+✅ Dependencies documented (requirements.txt, package.json)
+✅ VPS integration configured (/optv1 container)
+✅ Authentication system ready (bcrypt + JWT)
+✅ Metadata enrichment implemented (training_metadata.json)
+Next Steps:
+
+Test locally with actual VPS data
+Choose deployment strategy (standalone vs integrated)
+Configure optv1 VPS environment
+Deploy and test in production
+Create customer documentation/user guide
+🎯 Strategic Value
+Why Extract This as Standalone?
+Market Opportunity: Pack design is a separate service you can sell
+Lower Barrier: Customers don't need expensive hardware
+SaaS Model: Can offer subscription-based pack design service
+Scalability: Web app easier to scale than desktop app
+Sales Tool: Demo pack design without shipping hardware
+Focus: Simpler codebase = easier to maintain and enhance
+This extraction transforms a feature in your lab equipment into a standalone product you can sell to a different customer segment.

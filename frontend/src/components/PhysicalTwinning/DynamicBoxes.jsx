@@ -1,5 +1,5 @@
 import React from "react";
-import { orderData } from "./dummyData";
+import { Card, CardContent, Typography, Box, Grid } from "@mui/material";
 
 export const DynamicBoxes = ({
   packVoltage,
@@ -11,34 +11,61 @@ export const DynamicBoxes = ({
   num_cols,
   num_row,
 }) => {
+  const StatCard = ({ title, value, subValue }) => (
+    <Card 
+      elevation={2} 
+      sx={{ 
+        minWidth: 160, 
+        flex: 1, 
+        borderTop: '4px solid #e8442d',
+        borderRadius: '8px',
+        transition: 'transform 0.2s',
+        '&:hover': { transform: 'translateY(-4px)' }
+      }}
+    >
+      <CardContent sx={{ p: '16px !important', textAlign: 'center' }}>
+        <Typography variant="subtitle2" sx={{ color: '#666', fontWeight: 600, mb: 1, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          {title}
+        </Typography>
+        <Typography variant="h5" sx={{ color: '#e8442d', fontWeight: 700 }}>
+          {value}
+        </Typography>
+        {subValue && (
+          <Typography variant="caption" sx={{ color: '#999', display: 'block', mt: 0.5 }}>
+            {subValue}
+          </Typography>
+        )}
+      </CardContent>
+    </Card>
+  );
+
   return (
-    <div className="flex flex-row gap-6 flex-wrap items-center justify-center text-sm text-center md:text-lg lg:text-xl max-xs:flex-col max-xs:items-center">
-      <div className="max-w-[200px] flex flex-col items-center border-4 border-double border-[#ff851b] p-4 max-xs:w-full">
-        <span>No. of Cells</span>
-        <span className="text-[#e8442d]">
-          {num_cols && num_row ? `${num_cols}S${num_row}P = ${totalCells} cells` : totalCells}
-        </span>
-      </div>
-      <div className="max-w-[200px] flex flex-col items-center border-4 border-double border-[#ff851b] p-4 max-xs:w-full">
-        <span>Pack Voltage</span>
-        <span className="text-[#e8442d]">{packVoltage} V</span>
-      </div>
-      <div className="max-w-[200px] flex flex-col items-center border-4 border-double border-[#ff851b] p-4 max-xs:w-full">
-        <span>Pack Capacity</span>
-        <span className="text-[#e8442d]">{packCapacity} AH</span>
-      </div>
-      {!isConfig && (
-        <>
-          <div className="max-w-[200px] flex flex-col items-center border-4 border-double border-[#ff851b] p-4 max-xs:w-full">
-            <span>Pack Weight</span>
-            <span className="text-[#e8442d]">{packWeight} Kg</span>
-          </div>
-          <div className="max-w-[200px] flex flex-col items-center border-4 border-double border-[#ff851b] p-4 max-xs:w-full">
-            <span>Pack Price</span>
-            <span className="text-[#e8442d]">{packPrice} $</span>
-          </div>
-        </>
-      )}
-    </div>
+    <Box sx={{ width: '90%', mt: 2, mb: 4 }}>
+      <Grid container spacing={3} justifyContent="center">
+        <Grid item xs={12} sm={6} md={2.4}>
+          <StatCard 
+            title="Total Cells" 
+            value={totalCells} 
+            subValue={num_cols && num_row ? `${num_cols}S × ${num_row}P` : null}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={2.4}>
+          <StatCard title="Pack Voltage" value={`${packVoltage} V`} />
+        </Grid>
+        <Grid item xs={12} sm={6} md={2.4}>
+          <StatCard title="Pack Capacity" value={`${packCapacity} Ah`} />
+        </Grid>
+        {!isConfig && (
+          <>
+            <Grid item xs={12} sm={6} md={2.4}>
+              <StatCard title="Pack Weight" value={`${packWeight} Kg`} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={2.4}>
+              <StatCard title="Pack Price" value={`$ ${packPrice}`} />
+            </Grid>
+          </>
+        )}
+      </Grid>
+    </Box>
   );
 };

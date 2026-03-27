@@ -1,34 +1,11 @@
 import React from "react";
 import BatteryConfig from "./BatteryConfig";
-import { Button } from "@mui/material";
-import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 import { Footer } from "../Footer";
 
 export const PhysicalTwinning = () => {
-  const navigate = useNavigate();
-  
   return (
     <>
       <div className="text-black pt-4 flex flex-col gap-12 items-center justify-center">
-        {/* Back to BatteryScope-C Button */}
-        <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', paddingLeft: '40px' }}>
-          <Button
-            variant="outlined"
-            startIcon={<ArrowBackIcon />}
-            onClick={() => window.location.href = '/#/batteryscope-c'}
-            style={{
-              color: '#e8442d',
-              borderColor: '#e8442d',
-              textTransform: 'none',
-              fontWeight: 600,
-              padding: '8px 20px',
-            }}
-          >
-            Back to BatteryScope-C
-          </Button>
-        </div>
-        
         <h1 className="text-xl text-[#e8442d] text-center md:text-2xl lg:text-4xl font-bold">
           Batteryscope : Let us Build Your Battery
         </h1>
