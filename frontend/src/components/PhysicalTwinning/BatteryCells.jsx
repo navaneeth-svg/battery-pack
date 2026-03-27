@@ -81,7 +81,7 @@ export const BatteryCells = ({
         {warnings && warnings.length > 0 && (
           <div className="w-full max-w-6xl">
             {warnings.map((warning, idx) => (
-              <div key={idx} className="bg-yellow-900 border-2 border-yellow-500 text-white p-3 rounded mb-2 font-semibold">
+              <div key={idx} className="bg-white border-2 border-black text-black p-3 rounded mb-2 font-semibold">
                 {warning}
               </div>
             ))}
@@ -89,54 +89,54 @@ export const BatteryCells = ({
         )}
 
         {!warnings || warnings.length === 0 && (
-          <div className="bg-green-900 border-2 border-green-500 text-white p-3 rounded w-full max-w-6xl font-semibold">
+          <div className="bg-white border-2 border-black text-black p-3 rounded w-full max-w-6xl font-semibold">
             ✓ Pack design optimal - no warnings detected
           </div>
         )}
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-6xl">
-          <div className="bg-black border-2 border-red-500 p-4 rounded text-center">
-            <p className="text-white text-sm mb-1">Configuration</p>
-            <p className="text-red-500 text-xl font-bold">{statistics.configuration}</p>
-            <p className="text-gray-400 text-xs">{statistics.total_cells} cells</p>
+          <div className="bg-white border-2 border-black p-4 rounded text-center">
+            <p className="text-gray-700 text-sm mb-1">Configuration</p>
+            <p className="text-black text-xl font-bold">{statistics.configuration}</p>
+            <p className="text-gray-600 text-xs">{statistics.total_cells} cells</p>
           </div>
           
-          <div className="bg-black border-2 border-red-500 p-4 rounded text-center">
-            <p className="text-white text-sm mb-1">Pack Capacity</p>
-            <p className="text-red-500 text-xl font-bold">{statistics.pack_capacity_ah?.toFixed(2)} Ah</p>
-            <p className="text-gray-400 text-xs">{statistics.pack_capacity_mah?.toFixed(0)} mAh</p>
+          <div className="bg-white border-2 border-black p-4 rounded text-center">
+            <p className="text-gray-700 text-sm mb-1">Pack Capacity</p>
+            <p className="text-black text-xl font-bold">{statistics.pack_capacity_ah?.toFixed(2)} Ah</p>
+            <p className="text-gray-600 text-xs">{statistics.pack_capacity_mah?.toFixed(0)} mAh</p>
           </div>
           
-          <div className="bg-black border-2 border-red-500 p-4 rounded text-center">
-            <p className="text-white text-sm mb-1">Pack Energy</p>
-            <p className="text-red-500 text-xl font-bold">{statistics.energy_wh?.toFixed(1)} Wh</p>
-            <p className="text-gray-400 text-xs">{statistics.nominal_voltage?.toFixed(1)} V</p>
+          <div className="bg-white border-2 border-black p-4 rounded text-center">
+            <p className="text-gray-700 text-sm mb-1">Pack Energy</p>
+            <p className="text-black text-xl font-bold">{statistics.energy_wh?.toFixed(1)} Wh</p>
+            <p className="text-gray-600 text-xs">{statistics.nominal_voltage?.toFixed(1)} V</p>
           </div>
           
-          <div className="bg-black border-2 border-red-500 p-4 rounded text-center">
-            <p className="text-white text-sm mb-1">Avg SOH</p>
-            <p className="text-red-500 text-xl font-bold">{statistics.avg_soh?.toFixed(1)}%</p>
-            <p className="text-gray-400 text-xs">IR: {statistics.avg_ir?.toFixed(1)} Ω</p>
+          <div className="bg-white border-2 border-black p-4 rounded text-center">
+            <p className="text-gray-700 text-sm mb-1">Avg SOH</p>
+            <p className="text-black text-xl font-bold">{statistics.avg_soh?.toFixed(1)}%</p>
+            <p className="text-gray-600 text-xs">IR: {statistics.avg_ir?.toFixed(1)} Ω</p>
           </div>
         </div>
 
         {/* Pack Matrix Title */}
-        <div className="bg-red-100 border-2 border-red-500 p-3 rounded w-full max-w-6xl text-center">
-          <h2 className="text-red-600 text-xl font-bold">
+        <div className="bg-gray-100 border-2 border-black p-3 rounded w-full max-w-6xl text-center">
+          <h2 className="text-black text-xl font-bold">
             {numSeries}S × {numParallel}P BATTERY PACK - OPTIMIZED CELL DISTRIBUTION
           </h2>
         </div>
 
         {/* Matrix Grid - Unified Layout: All cells in one container */}
         <div className="overflow-x-auto w-full max-w-7xl">
-          <div className="border-4 border-red-500 rounded-lg p-6 bg-gradient-to-br from-gray-900 to-gray-800">
+          <div className="border-4 border-black rounded-lg p-6 bg-white">
             {/* Title */}
             <div className="text-center mb-6">
-              <h2 className="text-white text-2xl font-bold mb-2">
+              <h2 className="text-gray-800 text-2xl font-bold mb-2">
                 {numSeries}S × {numParallel}P Battery Pack Matrix
               </h2>
-              <p className="text-gray-300 text-sm">
+              <p className="text-gray-600 text-sm">
                 Series (Vertical) × Parallel (Horizontal) Configuration
               </p>
             </div>
@@ -147,7 +147,7 @@ export const BatteryCells = ({
               {Array.from({ length: numParallel }).map((_, parallelIdx) => (
                 <div key={`parallel-${parallelIdx}`} className="flex gap-2 items-center">
                   {/* Series String Label (was Parallel) */}
-                  <div className="w-20 flex flex-col items-center justify-center bg-blue-500 text-white font-bold text-sm border-2 border-black rounded p-2 flex-shrink-0">
+                  <div className="w-20 flex flex-col items-center justify-center bg-white text-black font-bold text-sm border-2 border-black rounded p-2 flex-shrink-0">
                     <div>S{parallelIdx + 1}</div>
                     <div className="text-xs mt-1">{column_totals.capacity[parallelIdx]?.toFixed(0)} mAh</div>
                   </div>
@@ -193,7 +193,7 @@ export const BatteryCells = ({
 
                           {/* Connection Symbol */}
                           {seriesIdx < pack_matrix.length - 1 && (
-                            <div className="flex items-center justify-center text-red-500 text-xl font-bold flex-shrink-0">
+                            <div className="flex items-center justify-center text-black text-xl font-bold flex-shrink-0">
                               ━
                             </div>
                           )}
@@ -218,7 +218,7 @@ export const BatteryCells = ({
 
                   return (
                     <React.Fragment key={`col-total-${seriesIdx}`}>
-                      <div className="w-24 flex flex-col items-center justify-center bg-green-600 text-white font-bold text-xs border-2 border-black rounded p-2 flex-shrink-0">
+                      <div className="w-24 flex flex-col items-center justify-center bg-white text-black font-bold text-xs border-2 border-black rounded p-2 flex-shrink-0">
                         <div>P{seriesIdx + 1} Total</div>
                         <div className="mt-1">{columnCapacity.toFixed(0)} mAh</div>
                       </div>
@@ -233,7 +233,7 @@ export const BatteryCells = ({
 
             {/* Grand Total */}
             <div className="mt-6 text-center">
-              <div className="inline-block bg-yellow-400 border-3 border-black rounded-lg px-6 py-3">
+              <div className="inline-block bg-white border-3 border-black rounded-lg px-6 py-3">
                 <p className="text-black font-bold text-lg">
                   Total Pack Capacity: {column_totals.capacity.reduce((sum, cap) => sum + cap, 0).toFixed(0)} mAh
                 </p>
