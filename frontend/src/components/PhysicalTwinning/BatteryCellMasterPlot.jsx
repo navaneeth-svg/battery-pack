@@ -12,6 +12,11 @@ export const BatteryCellMasterPlot = ({cellsData, num_cols, totalCells, url }) =
 
   useEffect(() => {
     const fetchCellsData = async () => {
+        if (!cellsData || cellsData.length === 0) {
+          console.warn('⚠️ No cells data available for master plot');
+          return;
+        }
+        
         const modulesData = {};
         cellsData.forEach((cell, index) => {
           const colIndex = (index % num_cols) + 1; 
@@ -19,8 +24,8 @@ export const BatteryCellMasterPlot = ({cellsData, num_cols, totalCells, url }) =
             modulesData[`module${colIndex}`] = [];
           }
           modulesData[`module${colIndex}`].push({
-            cell_id: cell._id,
-            soh: cell.meta.soh,
+            cell_id: cell.id || cell.uid || cell._id,
+            soh: cell.soh || cell.predicted_soh || cell.meta?.soh || 0,
           });
         });
         fetchPlotData(modulesData);
@@ -41,7 +46,7 @@ export const BatteryCellMasterPlot = ({cellsData, num_cols, totalCells, url }) =
     };
 
     fetchCellsData();
-  }, [totalCells, num_cols]);
+  }, [totalCells, num_cols, cellsData, url]);
 
   const moduleKeys = Object.keys(plotData);
 

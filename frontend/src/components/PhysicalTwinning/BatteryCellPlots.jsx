@@ -17,6 +17,11 @@ export const BatteryCellPlots = ({ cellsData, num_cols, totalCells, url, plotTyp
 
   useEffect(() => {
     const fetchCellsData = async () => {
+      if (!cellsData || cellsData.length === 0) {
+        console.warn('⚠️ No cells data available for plots');
+        return;
+      }
+      
       const modulesData = {};
       cellsData.forEach((cell, index) => {
         const colIndex = (index % num_cols) + 1;

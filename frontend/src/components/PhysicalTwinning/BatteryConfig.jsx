@@ -977,31 +977,35 @@ const BatteryConfig = () => {
           )}
           {tabValue === 2 && (
             <>
-              <div className="flex flex-col border border-[#e8432d29] bg-[#111111] rounded-lg w-[100%] py-5">
-                <h1 className="text-xl text-[#ffffff] underline text-center md:text-xl lg:text-2xl">
+              <div className="flex flex-col border border-[#e8432d29] bg-[#111111] rounded-lg w-full max-w-[95%] mx-auto py-5 px-4 mb-8">
+                <h1 className="text-xl text-[#ffffff] underline text-center md:text-xl lg:text-2xl mb-4">
                   Master Plot Capacity vs Cycle Plots
                 </h1>
-                <BatteryCellMasterPlot
-                  cellsData={cellsData}
-                  num_cols={num_cols}
-                  totalCells={totalCells}
-                  url="battery_variance_master_capacity_vs_cycle"
-                />
+                <div className="w-full min-h-[400px]">
+                  <BatteryCellMasterPlot
+                    cellsData={cellsData}
+                    num_cols={num_cols}
+                    totalCells={totalCells}
+                    url="battery_variance_master_capacity_vs_cycle"
+                  />
+                </div>
               </div>
             </>
           )}
           {tabValue === 3 && (
             <>
-              <div className="flex flex-col border border-[#e8432d29] bg-[#111111] rounded-lg w-[100%] py-5">
-                <h1 className="text-xl text-[#ffffff] underline text-center md:text-xl lg:text-2xl">
+              <div className="flex flex-col border border-[#e8432d29] bg-[#111111] rounded-lg w-full max-w-[95%] mx-auto py-5 px-4 mb-8">
+                <h1 className="text-xl text-[#ffffff] underline text-center md:text-xl lg:text-2xl mb-4">
                   Master Plot IR vs Cycle Plots
                 </h1>
-                <BatteryCellMasterPlot
-                  cellsData={cellsData}
-                  num_cols={num_cols}
-                  totalCells={totalCells}
-                  url="battery_variance_master_ir_vs_cycle"
-                />
+                <div className="w-full min-h-[400px]">
+                  <BatteryCellMasterPlot
+                    cellsData={cellsData}
+                    num_cols={num_cols}
+                    totalCells={totalCells}
+                    url="battery_variance_master_ir_vs_cycle"
+                  />
+                </div>
               </div>
             </>
           )}
@@ -1017,11 +1021,11 @@ const BatteryConfig = () => {
         packCapacity: packCapacity
       }} />
 
-      <div className="text-black pt-4 flex flex-col gap-12 items-center justify-center">
+      <div className="text-black pt-8 mt-12 flex flex-col gap-12 items-center justify-center clear-both">
         <h1 className="text-xl text-[#e8442d] text-center md:text-2xl lg:text-4xl">
           BatteryScope: Battery Rapid Prototyping powered by Digital Twins
         </h1>
-        <p className="text-sm  md:text-lg lg:text-xl w-[85%] text-justify text-black">
+        <p className="text-sm  md:text-lg lg:text-xl w-[85%] text-justify text-black mb-16">
           Our Physical Twinning service helps you do rapid Battery Prototyping for any climatic
           condition on earth and beyond. Just enter your battery specs, pick fully characterized cells
           from our Cell store, build a digital twin and analyse the performance. Once you are happy,
