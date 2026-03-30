@@ -1,0 +1,45 @@
+.loader-container{
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 9;
+    
+  }
+  /* &.inline {
+    height: 100%;
+    width: 100%;
+  } */
+  .global-loader {
+    width: 80px;
+    height: 100px;
+  }
+  .global-loader .path-1 {
+      stroke-dashoffset: 100;
+      animation: dash 0.5s linear alternate infinite;
+    
+  }
+ .global-loader .path-2 {
+    animation-delay: 0.5s;
+    stroke-dashoffset: 100;
+    animation: dash 0.5s linear alternate infinite;
+  }
+  @keyframes dash {
+    from {
+      stroke-dashoffset: 100;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .loader-widget{
+    display: flex;
+    justify-content: center;
+    align-content: center;
+  }

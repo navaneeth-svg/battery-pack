@@ -170,7 +170,7 @@ export const BatteryCells = ({
                                 className="w-24 h-24 border-2 border-black rounded flex flex-col items-center justify-center gap-0.5 cursor-pointer hover:scale-105 transition-transform flex-shrink-0 relative"
                                 style={{ backgroundColor: getCapacityColor(parseFloat(cell.predicted_capacity || cell.capacity || 0)) }}
                                 title={`UID: ${cell.uid || cell.cellId || cell.id}\nCapacity: ${parseFloat(cell.predicted_capacity || cell.capacity || 0).toFixed(0)} mAh\nSOH: ${parseFloat(cell.predicted_soh || cell.soh || 0).toFixed(2)}%\nIR: ${parseFloat(cell.ir || 0).toFixed(2)} Ω`}
-                                onClick={() => window.open(`/#/batteryscope-c/cell-health-certificate?uid=${cell.uid || cell.cellId || cell.id}`, "_blank")}
+                                onClick={() => window.open(`/cell-health-certificate?uid=${cell.uid || cell.cellId || cell.id}`, "_blank")}
                               >
                                 {/* Parallel label on top of first row cells */}
                                 {parallelIdx === 0 && (

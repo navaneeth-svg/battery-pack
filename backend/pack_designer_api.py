@@ -30,6 +30,72 @@ def health_check():
     }), 200
 
 
+@app.route('/get-cell-by-uid/<uid>', methods=['GET'])
+def get_cell_by_uid(uid):
+    """
+    Fetch specific cell data by UID from VPS storage
+    
+    Parameters:
+    - uid: Cell unique identifier from pack design
+    
+    Returns:
+    - Cell data including predicted_soh, predicted_capacity, ocv, ir, etc.
+    """
+    try:
+        print(f"🔍 Fetching cell data for UID: {uid}")
+        
+        # Try both training and prediction endpoints
+        for sample_type in ['training', 'prediction']:
+            # Fetch the metadata.json that contains cell data
+            metadata_dict = fetch_metadata_from_vps(sample_type)
+            
+            if not metadata_dict:
+                continue
+            
+            # Search for UID in metadata keys
+            # Keys are formatted as: "uid_timestamp" (e.g., "524_20260310_150909")
+            matching_key = None
+            for key in metadata_dict.keys():
+                if key.startswith(f"{uid}_") or key.startswith(f"0{uid}_"):
+                    matching_key = key
+                    break
+            
+            if matching_key:
+                cell_data = metadata_dict[matching_key]
+                print(f"✅ Found cell {uid} in {sample_type} metadata")
+                
+                return jsonify({
+                    'success': True,
+                    'uid': uid,
+                    'predicted_soh': cell_data.get('predicted_soh'),
+                    'predicted_capacity': cell_data.get('predicted_capacity'),
+                    'soh': cell_data.get('soh'),
+                    'capacity': cell_data.get('capacity'),
+                    'ocv': cell_data.get('ocv'),
+                    'ir': cell_data.get('ir'),
+                    'makeModel': cell_data.get('makeModel', 'LG 21700'),
+                    'cellChemistry': cell_data.get('cellChemistry', 'NMC'),
+                    'nominalCapacity': cell_data.get('nominalCapacity', 5000),
+                    'nominalVoltage': cell_data.get('nominalVoltage', 3.6)
+                }), 200
+        
+        # If not found in either dataset
+        print(f"❌ Cell {uid} not found in VPS storage")
+        return jsonify({
+            'success': False,
+            'error': f'Cell with UID {uid} not found'
+        }), 404
+        
+    except Exception as e:
+        print(f"❌ Error fetching cell data: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
 @app.route('/fetch-inventory', methods=['GET'])
 def fetch_inventory():
     """

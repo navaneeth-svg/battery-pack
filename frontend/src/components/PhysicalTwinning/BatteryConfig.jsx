@@ -834,7 +834,7 @@ const BatteryConfig = () => {
                 <TabPanel value={outputTabValue} index={0}>
                   {/* <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden', maxHeight: '500px' }}> */}
                   <BatteryCells
-                    cellsData={cellsData}
+                    cellsData={packDesignData && packDesignData.pack_matrix ? packDesignData.pack_matrix.flat() : cellsData}
                     setCellsData={setCellsData}
                     num_cols={num_cols}
                     div_html={div_html}
