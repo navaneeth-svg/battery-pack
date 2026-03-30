@@ -31,7 +31,7 @@ function ChargeDischargePlot({ currentCapacity = 3.0 }) {
     useEffect(() => {
         if (!window.Plotly) {
             const script = document.createElement('script');
-            script.src = 'https://cdn.plot.ly/plotly-latest.min.js';
+            script.src = 'https://cdn.plot.ly/plotly-2.35.2.min.js';
             script.async = true;
             document.body.appendChild(script);
             script.onload = () => renderPlot();

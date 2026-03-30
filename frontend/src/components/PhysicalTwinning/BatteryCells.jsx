@@ -117,7 +117,6 @@ export const BatteryCells = ({
           <div className="bg-white border-2 border-black p-4 rounded text-center">
             <p className="text-gray-700 text-sm mb-1">Avg SOH</p>
             <p className="text-black text-xl font-bold">{statistics.avg_soh?.toFixed(1)}%</p>
-            <p className="text-gray-600 text-xs">IR: {statistics.avg_ir?.toFixed(1)} Ω</p>
           </div>
         </div>
 
@@ -169,7 +168,7 @@ export const BatteryCells = ({
                               <div 
                                 className="w-24 h-24 border-2 border-black rounded flex flex-col items-center justify-center gap-0.5 cursor-pointer hover:scale-105 transition-transform flex-shrink-0 relative"
                                 style={{ backgroundColor: getCapacityColor(parseFloat(cell.predicted_capacity || cell.capacity || 0)) }}
-                                title={`UID: ${cell.uid || cell.cellId || cell.id}\nCapacity: ${parseFloat(cell.predicted_capacity || cell.capacity || 0).toFixed(0)} mAh\nSOH: ${parseFloat(cell.predicted_soh || cell.soh || 0).toFixed(2)}%\nIR: ${parseFloat(cell.ir || 0).toFixed(2)} Ω`}
+                                title={`UID: ${cell.uid || cell.cellId || cell.id}\nCapacity: ${parseFloat(cell.predicted_capacity || cell.capacity || 0).toFixed(0)} mAh\nSOH: ${parseFloat(cell.predicted_soh || cell.soh || 0).toFixed(2)}%`}
                                 onClick={() => window.open(`/cell-health-certificate?uid=${cell.uid || cell.cellId || cell.id}`, "_blank")}
                               >
                                 {/* Parallel label on top of first row cells */}
@@ -183,9 +182,6 @@ export const BatteryCells = ({
                                 <span className="text-xs font-bold text-black">{parseFloat(cell.predicted_capacity || cell.capacity || 0).toFixed(0)}</span>
                                 <span className="text-xs bg-white px-1.5 py-0.5 rounded border border-black font-bold">
                                   {parseFloat(cell.predicted_soh || cell.soh || 0).toFixed(2)}%
-                                </span>
-                                <span className="text-xs text-black font-semibold">
-                                  IR: {parseFloat(cell.ir || 0).toFixed(1)}Ω
                                 </span>
                               </div>
                             )}

@@ -198,7 +198,7 @@ function InternalResistanceVsCyclePlot({ currentSOH }) {
         window.Plotly.newPlot('resistancePlot', traces, layout, config);
 
         return () => {
-            if (window.Plotly) {
+            if (window.Plotly && document.getElementById('resistancePlot')) {
                 window.Plotly.purge('resistancePlot');
             }
         };
@@ -208,7 +208,7 @@ function InternalResistanceVsCyclePlot({ currentSOH }) {
         // Load Plotly if not already loaded
         if (!window.Plotly) {
             const script = document.createElement('script');
-            script.src = 'https://cdn.plot.ly/plotly-latest.min.js';
+            script.src = 'https://cdn.plot.ly/plotly-2.35.2.min.js';
             script.async = true;
             document.body.appendChild(script);
         }

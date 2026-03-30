@@ -25,12 +25,11 @@ export const InventoryProvider = ({ children }) => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const savedData = await loadFromIndexedDB();
-        if (savedData) {
-          setTrainingItems(savedData.trainingItems || []);
-          setPredictionItems(savedData.predictionItems || []);
-          setLastProcessedFile(savedData.lastProcessedFile || null);
-        }
+        const trainingData = await loadFromIndexedDB('training');
+        const predictionData = await loadFromIndexedDB('predictions');
+        
+        setTrainingItems(trainingData || []);
+        setPredictionItems(predictionData || []);
       } catch (error) {
         console.error('Failed to load inventory:', error);
       } finally {
@@ -42,17 +41,20 @@ export const InventoryProvider = ({ children }) => {
 
   // Save to IndexedDB whenever items change
   useEffect(() => {
-    if (!isLoading) {
-      const dataToSave = {
-        trainingItems,
-        predictionItems,
-        lastProcessedFile
-      };
-      saveToIndexedDB(dataToSave).catch(error => {
-        console.error('Failed to save inventory:', error);
+    if (!isLoading && trainingItems.length > 0) {
+      saveToIndexedDB('training', trainingItems).catch(error => {
+        console.error('Failed to save training items:', error);
       });
     }
-  }, [trainingItems, predictionItems, isLoading, lastProcessedFile]);
+  }, [trainingItems, isLoading]);
+
+  useEffect(() => {
+    if (!isLoading && predictionItems.length > 0) {
+      saveToIndexedDB('predictions', predictionItems).catch(error => {
+        console.error('Failed to save prediction items:', error);
+      });
+    }
+  }, [predictionItems, isLoading]);
 
   // Helper function to get random cell image
   const getRandomCellImage = () => {

@@ -90,12 +90,16 @@ function CapacityVsCyclePlot({ currentSOH }) {
 
         const traces = [trace, ...markerTraces];
 
+        // Calculate SOH values from capacity for annotations
+        const initialCapacity = plotData.capacity_mah[0];
+        const sohValues = plotData.capacity_mah.map(cap => (cap / initialCapacity) * 100);
+
         // Add annotations for degradation milestones
         const annotations = [
             {
-                x: plotData.cycle[0],
-                y: plotData.capacity[0],
-                text: `Initial<br>SOH: ${plotData.soh[0].toFixed(1)}%`,
+                x: plotData.cycles[0],
+                y: plotData.capacity_mah[0],
+                text: `Initial<br>SOH: ${sohValues[0].toFixed(1)}%`,
                 showarrow: true,
                 arrowhead: 2,
                 ax: -40,
@@ -108,12 +112,12 @@ function CapacityVsCyclePlot({ currentSOH }) {
         ];
 
         // Find knee onset (SOH ~95%)
-        const kneeOnsetIndex = plotData.soh.findIndex(soh => soh <= 95);
+        const kneeOnsetIndex = sohValues.findIndex(soh => soh <= 95);
         if (kneeOnsetIndex >= 0) {
             annotations.push({
-                x: plotData.cycle[kneeOnsetIndex],
-                y: plotData.capacity[kneeOnsetIndex],
-                text: `Knee Onset<br>SOH: ${plotData.soh[kneeOnsetIndex].toFixed(1)}%`,
+                x: plotData.cycles[kneeOnsetIndex],
+                y: plotData.capacity_mah[kneeOnsetIndex],
+                text: `Knee Onset<br>SOH: ${sohValues[kneeOnsetIndex].toFixed(1)}%`,
                 showarrow: true,
                 arrowhead: 2,
                 ax: -40,
@@ -126,12 +130,12 @@ function CapacityVsCyclePlot({ currentSOH }) {
         }
 
         // Find knee point (SOH ~85%)
-        const kneePointIndex = plotData.soh.findIndex(soh => soh <= 85);
+        const kneePointIndex = sohValues.findIndex(soh => soh <= 85);
         if (kneePointIndex >= 0) {
             annotations.push({
-                x: plotData.cycle[kneePointIndex],
-                y: plotData.capacity[kneePointIndex],
-                text: `Knee Point<br>SOH: ${plotData.soh[kneePointIndex].toFixed(1)}%`,
+                x: plotData.cycles[kneePointIndex],
+                y: plotData.capacity_mah[kneePointIndex],
+                text: `Knee Point<br>SOH: ${sohValues[kneePointIndex].toFixed(1)}%`,
                 showarrow: true,
                 arrowhead: 2,
                 ax: 40,
@@ -144,12 +148,12 @@ function CapacityVsCyclePlot({ currentSOH }) {
         }
 
         // Find EOL (SOH ~80%)
-        const eolIndex = plotData.soh.findIndex(soh => soh <= 80);
+        const eolIndex = sohValues.findIndex(soh => soh <= 80);
         if (eolIndex >= 0) {
             annotations.push({
-                x: plotData.cycle[eolIndex],
-                y: plotData.capacity[eolIndex],
-                text: `EOL<br>SOH: ${plotData.soh[eolIndex].toFixed(1)}%`,
+                x: plotData.cycles[eolIndex],
+                y: plotData.capacity_mah[eolIndex],
+                text: `EOL<br>SOH: ${sohValues[eolIndex].toFixed(1)}%`,
                 showarrow: true,
                 arrowhead: 2,
                 ax: 40,
@@ -205,7 +209,7 @@ function CapacityVsCyclePlot({ currentSOH }) {
         window.Plotly.newPlot('capacityPlot', traces, layout, config);
 
         return () => {
-            if (window.Plotly) {
+            if (window.Plotly && document.getElementById('capacityPlot')) {
                 window.Plotly.purge('capacityPlot');
             }
         };
@@ -215,7 +219,7 @@ function CapacityVsCyclePlot({ currentSOH }) {
         // Load Plotly if not already loaded
         if (!window.Plotly) {
             const script = document.createElement('script');
-            script.src = 'https://cdn.plot.ly/plotly-latest.min.js';
+            script.src = 'https://cdn.plot.ly/plotly-2.35.2.min.js';
             script.async = true;
             document.body.appendChild(script);
         }

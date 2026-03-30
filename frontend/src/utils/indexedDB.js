@@ -38,7 +38,19 @@ export const saveToIndexedDB = async (storeName, data) => {
     const transaction = db.transaction([storeName], 'readwrite');
     const store = transaction.objectStore(storeName);
     
-    await store.put(data);
+    // Clear existing data first
+    await store.clear();
+    
+    // If data is an array, save each item
+    if (Array.isArray(data)) {
+      for (const item of data) {
+        if (item.id || item.barcode) {
+          await store.put({ ...item, id: item.id || item.barcode });
+        }
+      }
+    } else if (data && (data.id || data.barcode)) {
+      await store.put({ ...data, id: data.id || data.barcode });
+    }
     
     return { success: true };
   } catch (error) {
