@@ -7,6 +7,7 @@ function CapacityVsCyclePlot({ currentSOH, currentCapacity }) {
 
     useEffect(() => {
         // Load capacity data
+        console.log('📊 CapacityVsCyclePlot - currentSOH:', currentSOH, 'currentCapacity:', currentCapacity);
         fetch('/capacity_vs_cycle_data.json')
             .then(response => response.json())
             .then(jsonData => {
@@ -32,6 +33,8 @@ function CapacityVsCyclePlot({ currentSOH, currentCapacity }) {
                 
                 const cycleNumber = data.cycles[closestIndex];
                 const capacityValue = data.capacity_mah[closestIndex];
+                
+                console.log('🎯 Marker Position - Cycle:', cycleNumber, 'Capacity:', capacityValue, 'Index:', closestIndex);
                 
                 // Create marker for current cell position
                 setMarkers([{
