@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
 import { CircularProgress } from '@mui/material';
 
-function CombinedCapacityResistancePlot({ currentSOH }) {
+function CombinedCapacityResistancePlot({ currentSOH, currentCapacity }) {
     const [plotData, setPlotData] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -41,15 +41,16 @@ function CombinedCapacityResistancePlot({ currentSOH }) {
         );
     }
 
-    // Calculate SOH from capacity values and find current cell position
+    // Calculate SOH from capacity values and find current cell position by actual capacity
     const initialCapacity = plotData.capacity_mah[0];
     const capacitiesAsSOH = plotData.capacity_mah.map(cap => (cap / initialCapacity) * 100);
     
+    // Find cycle where capacity matches current cell's actual capacity
     let closestIndex = 0;
-    let minDiff = Math.abs(capacitiesAsSOH[0] - currentSOH);
+    let minDiff = Math.abs(plotData.capacity_mah[0] - currentCapacity);
     
-    for (let i = 1; i < capacitiesAsSOH.length; i++) {
-        const diff = Math.abs(capacitiesAsSOH[i] - currentSOH);
+    for (let i = 1; i < plotData.capacity_mah.length; i++) {
+        const diff = Math.abs(plotData.capacity_mah[i] - currentCapacity);
         if (diff < minDiff) {
             minDiff = diff;
             closestIndex = i;
@@ -57,7 +58,7 @@ function CombinedCapacityResistancePlot({ currentSOH }) {
     }
     
     const currentCycle = plotData.cycles[closestIndex];
-    const currentCapacity = plotData.capacity_mah[closestIndex];
+    const currentCapacityValue = plotData.capacity_mah[closestIndex];
     const currentResistance = plotData.resistance_mohm ? plotData.resistance_mohm[closestIndex] : 0;
 
     // Capacity trace
@@ -87,20 +88,20 @@ function CombinedCapacityResistancePlot({ currentSOH }) {
     // Current cell marker - capacity
     const currentCapacityMarker = {
         x: [currentCycle],
-        y: [currentCapacity],
+        y: [currentCapacityValue],
         type: 'scatter',
         mode: 'markers+text',
         name: 'This Cell (Capacity)',
         yaxis: 'y',
         marker: {
-            size: 15,
-            color: '#ffffff',
-            symbol: 'circle',
-            line: { color: '#000000', width: 2 }
+            size: 20,
+            color: '#00ffff',
+            symbol: 'star',
+            line: { color: '#ffffff', width: 3 }
         },
-        text: ['This Cell'],
+        text: [`This Cell (${currentCapacity.toFixed(1)} mAh)`],
         textposition: 'top center',
-        textfont: { color: '#ffffff', size: 12, family: 'Bai Jamjuree, sans-serif' }
+        textfont: { color: '#00ffff', size: 14, family: 'Bai Jamjuree, sans-serif', weight: 'bold' }
     };
 
     // Current cell marker - resistance
@@ -112,10 +113,10 @@ function CombinedCapacityResistancePlot({ currentSOH }) {
         name: 'This Cell (Resistance)',
         yaxis: 'y2',
         marker: {
-            size: 15,
-            color: '#ffffff',
-            symbol: 'diamond',
-            line: { color: '#000000', width: 2 }
+            size: 20,
+            color: '#00ffff',
+            symbol: 'star',
+            line: { color: '#ffffff', width: 3 }
         },
         showlegend: false
     };

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-function CapacityVsCyclePlot({ currentSOH }) {
+function CapacityVsCyclePlot({ currentSOH, currentCapacity }) {
     const [plotData, setPlotData] = useState(null);
     const [markers, setMarkers] = useState([]);
 
@@ -17,16 +17,12 @@ function CapacityVsCyclePlot({ currentSOH }) {
                 
                 setPlotData(data);
                 
-                // Calculate SOH from capacity values
-                const initialCapacity = jsonData.metadata?.initial_capacity_mah || data.capacity_mah[0];
-                const currentCapacityAtSOH = (currentSOH / 100) * initialCapacity;
-                
-                // Find the cycle number where capacity is closest to currentSOH
+                // Find the cycle number where capacity is closest to current cell's actual capacity
                 let closestIndex = 0;
-                let minDiff = Math.abs(data.capacity_mah[0] - currentCapacityAtSOH);
+                let minDiff = Math.abs(data.capacity_mah[0] - currentCapacity);
                 
                 for (let i = 1; i < data.capacity_mah.length; i++) {
-                    const diff = Math.abs(data.capacity_mah[i] - currentCapacityAtSOH);
+                    const diff = Math.abs(data.capacity_mah[i] - currentCapacity);
                     if (diff < minDiff) {
                         minDiff = diff;
                         closestIndex = i;
@@ -40,12 +36,12 @@ function CapacityVsCyclePlot({ currentSOH }) {
                 setMarkers([{
                     x: cycleNumber,
                     y: capacityValue,
-                    name: 'This Cell',
-                    color: '#ffffff'
+                    name: `This Cell (${currentCapacity.toFixed(1)} mAh, SOH: ${currentSOH.toFixed(1)}%)`,
+                    color: '#00ffff'
                 }]);
             })
             .catch(error => console.error('Error loading capacity data:', error));
-    }, [currentSOH]);
+    }, [currentSOH, currentCapacity]);
 
     useEffect(() => {
         if (!plotData || !window.Plotly) return;
@@ -71,20 +67,21 @@ function CapacityVsCyclePlot({ currentSOH }) {
             mode: 'markers+text',
             name: marker.name,
             marker: {
-                size: 12,
-                color: marker.color,
-                symbol: 'circle',
+                size: 20,
+                color: '#00ffff',
+                symbol: 'star',
                 line: {
-                    color: '#000000',
-                    width: 2
+                    color: '#ffffff',
+                    width: 3
                 }
             },
             text: [marker.name],
             textposition: 'top center',
             textfont: {
-                color: marker.color,
-                size: 12,
-                family: 'Bai Jamjuree, sans-serif'
+                color: '#00ffff',
+                size: 14,
+                family: 'Bai Jamjuree, sans-serif',
+                weight: 'bold'
             }
         }));
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-function InternalResistanceVsCyclePlot({ currentSOH }) {
+function InternalResistanceVsCyclePlot({ currentSOH, currentCapacity }) {
     const [resistanceData, setResistanceData] = useState(null);
     const [capacityData, setCapacityData] = useState(null);
     const [markers, setMarkers] = useState([]);
@@ -28,14 +28,12 @@ function InternalResistanceVsCyclePlot({ currentSOH }) {
     useEffect(() => {
         if (!capacityData || !resistanceData || !capacityData.cycles || !capacityData.capacity_mah) return;
 
-        // Calculate SOH from capacity values and find cycle number where SOH matches currentSOH
-        const initialCapacity = capacityData.capacity_mah[0];
+        // Find cycle number where capacity matches current cell's actual capacity
         let closestIndex = 0;
-        let minDiff = Infinity;
+        let minDiff = Math.abs(capacityData.capacity_mah[0] - currentCapacity);
         
-        for (let i = 0; i < capacityData.capacity_mah.length; i++) {
-            const sohAtCycle = (capacityData.capacity_mah[i] / initialCapacity) * 100;
-            const diff = Math.abs(sohAtCycle - currentSOH);
+        for (let i = 1; i < capacityData.capacity_mah.length; i++) {
+            const diff = Math.abs(capacityData.capacity_mah[i] - currentCapacity);
             if (diff < minDiff) {
                 minDiff = diff;
                 closestIndex = i;
@@ -50,13 +48,16 @@ function InternalResistanceVsCyclePlot({ currentSOH }) {
         const resistanceIndex = resistanceCycles.findIndex(c => c >= cycleNumber);
         const resistanceValue = resistanceValues[resistanceIndex] || resistanceValues[resistanceValues.length - 1];
         
+        const initialR = resistanceValues[0];
+        const rIncreasePercent = ((resistanceValue - initialR) / initialR) * 100;
+        
         setMarkers([{
             x: cycleNumber,
             y: resistanceValue,
-            name: 'This Cell',
-            color: '#ffffff'
+            name: `This Cell (R: ${resistanceValue.toFixed(2)} mΩ, +${rIncreasePercent.toFixed(1)}%)`,
+            color: '#00ffff'
         }]);
-    }, [currentSOH, capacityData, resistanceData]);
+    }, [currentSOH, currentCapacity, capacityData, resistanceData]);
 
     useEffect(() => {
         if (!resistanceData || !window.Plotly || !resistanceData.cycles || !resistanceData.resistance_mohm) return;
@@ -82,20 +83,21 @@ function InternalResistanceVsCyclePlot({ currentSOH }) {
             mode: 'markers+text',
             name: marker.name,
             marker: {
-                size: 12,
-                color: marker.color,
-                symbol: 'circle',
+                size: 20,
+                color: '#00ffff',
+                symbol: 'star',
                 line: {
-                    color: '#000000',
-                    width: 2
+                    color: '#ffffff',
+                    width: 3
                 }
             },
             text: [marker.name],
             textposition: 'top center',
             textfont: {
-                color: marker.color,
-                size: 12,
-                family: 'Bai Jamjuree, sans-serif'
+                color: '#00ffff',
+                size: 14,
+                family: 'Bai Jamjuree, sans-serif',
+                weight: 'bold'
             }
         }));
 

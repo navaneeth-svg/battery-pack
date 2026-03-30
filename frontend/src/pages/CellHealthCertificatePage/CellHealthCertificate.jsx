@@ -889,7 +889,7 @@ const CellHealthCertificate = () => {
                 <Typography variant="h6" sx={{ color: '#e8442d', mb: 3, textAlign: 'center', fontWeight: 700, fontFamily: 'Bai Jamjuree' }}>
                   Cell Aging Reference Data: Capacity vs Cycles
                 </Typography>
-                <CapacityVsCyclePlot currentSOH={currentSOH} />
+                <CapacityVsCyclePlot currentSOH={currentSOH} currentCapacity={currentCapacity} />
               </Paper>
 
               <Paper elevation={3} sx={{
@@ -902,7 +902,7 @@ const CellHealthCertificate = () => {
                 <Typography variant="h6" sx={{ color: '#e8442d', mb: 3, textAlign: 'center', fontWeight: 700, fontFamily: 'Bai Jamjuree' }}>
                   Cell Aging Reference Data: Internal Resistance vs Cycles
                 </Typography>
-                <InternalResistanceVsCyclePlot currentSOH={currentSOH} />
+                <InternalResistanceVsCyclePlot currentSOH={currentSOH} currentCapacity={currentCapacity} />
               </Paper>
 
               <Paper elevation={3} sx={{
@@ -915,7 +915,7 @@ const CellHealthCertificate = () => {
                 <Typography variant="h6" sx={{ color: '#e8442d', mb: 3, textAlign: 'center', fontWeight: 700, fontFamily: 'Bai Jamjuree' }}>
                   Cell Aging Reference Data: Combined Capacity and Resistance vs Cycles
                 </Typography>
-                <CombinedCapacityResistancePlot currentSOH={currentSOH} />
+                <CombinedCapacityResistancePlot currentSOH={currentSOH} currentCapacity={currentCapacity} />
               </Paper>
             </Box>
 
