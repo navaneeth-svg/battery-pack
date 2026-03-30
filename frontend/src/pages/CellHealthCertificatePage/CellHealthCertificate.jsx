@@ -388,13 +388,15 @@ const CellHealthCertificate = () => {
   return (
     <Box sx={{
       background: 'linear-gradient(135deg, #000 0%, #1a1a1a 50%, #000 100%)',
-      borderRadius: '2rem',
-      p: 3,
+      borderRadius: '0',
+      p: 0,
+      m: 0,
       fontFamily: 'Bai Jamjuree',
       color: '#fff',
-      height: '90vh',
+      minHeight: '100vh',
+      height: '100%',
       position: 'relative',
-      border: '1px solid rgba(232, 68, 45, 0.2)',
+      border: 'none',
       display: 'flex',
       flexDirection: 'column',
       width: '100%',
@@ -495,10 +497,9 @@ const CellHealthCertificate = () => {
           flexDirection: 'column',
           minWidth: 0,
           overflowY: 'auto',
-          maxHeight: '80vh',
           position: 'relative',
-          height: 'calc(90vh - 60px)',
-          mb: 0.5
+          height: '100%',
+          mb: 0
         }}>
           <Box
             ref={certificateRef}
@@ -509,8 +510,8 @@ const CellHealthCertificate = () => {
               overflowY: 'auto',
               overflowX: 'hidden',
               background: 'linear-gradient(135deg, #000 0%, #1a1a1a 50%, #000 100%)',
-              borderRadius: '2rem',
-              p: 2,
+              borderRadius: '0',
+              p: 0,
               '&::-webkit-scrollbar': {
                 width: '8px',
               },
@@ -919,7 +920,7 @@ const CellHealthCertificate = () => {
               </Paper>
             </Box>
 
-            <Typography variant="body2" sx={{ color: '#cccccc', textAlign: 'center', mb: 2, fontFamily: 'Bai Jamjuree' }}>
+            <Typography variant="body2" sx={{ color: '#cccccc', textAlign: 'center', mb: 0, fontFamily: 'Bai Jamjuree' }}>
               End of Certificate
             </Typography>
           </Box>

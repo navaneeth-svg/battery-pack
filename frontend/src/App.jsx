@@ -8,7 +8,7 @@ function App() {
   return (
     <BrowserRouter>
       <InventoryProvider>
-        <div className="App">
+        <div className="App" style={{ margin: 0, padding: 0 }}>
           <Routes>
             <Route path="/" element={<Navigate to="/pack-designer" replace />} />
             <Route path="/pack-designer" element={<PhysicalTwinning />} />
