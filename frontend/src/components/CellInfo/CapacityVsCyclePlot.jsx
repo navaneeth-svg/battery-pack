@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 function CapacityVsCyclePlot({ currentSOH, currentCapacity }) {
     const [plotData, setPlotData] = useState(null);
     const [markers, setMarkers] = useState([]);
+    const [plotlyLoaded, setPlotlyLoaded] = useState(false);
 
     useEffect(() => {
         // Load capacity data
@@ -44,7 +45,7 @@ function CapacityVsCyclePlot({ currentSOH, currentCapacity }) {
     }, [currentSOH, currentCapacity]);
 
     useEffect(() => {
-        if (!plotData || !window.Plotly) return;
+        if (!plotData || !plotlyLoaded || !window.Plotly) return;
 
         const trace = {
             x: plotData.cycles,
@@ -210,14 +211,17 @@ function CapacityVsCyclePlot({ currentSOH, currentCapacity }) {
                 window.Plotly.purge('capacityPlot');
             }
         };
-    }, [plotData, markers]);
+    }, [plotData, markers, plotlyLoaded]);
 
     useEffect(() => {
         // Load Plotly if not already loaded
-        if (!window.Plotly) {
+        if (window.Plotly) {
+            setPlotlyLoaded(true);
+        } else {
             const script = document.createElement('script');
             script.src = 'https://cdn.plot.ly/plotly-2.35.2.min.js';
             script.async = true;
+            script.onload = () => setPlotlyLoaded(true);
             document.body.appendChild(script);
         }
     }, []);

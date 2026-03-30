@@ -4,6 +4,7 @@ function InternalResistanceVsCyclePlot({ currentSOH, currentCapacity }) {
     const [resistanceData, setResistanceData] = useState(null);
     const [capacityData, setCapacityData] = useState(null);
     const [markers, setMarkers] = useState([]);
+    const [plotlyLoaded, setPlotlyLoaded] = useState(false);
 
     useEffect(() => {
         // Load resistance data
@@ -60,7 +61,7 @@ function InternalResistanceVsCyclePlot({ currentSOH, currentCapacity }) {
     }, [currentSOH, currentCapacity, capacityData, resistanceData]);
 
     useEffect(() => {
-        if (!resistanceData || !window.Plotly || !resistanceData.cycles || !resistanceData.resistance_mohm) return;
+        if (!resistanceData || !plotlyLoaded || !window.Plotly || !resistanceData.cycles || !resistanceData.resistance_mohm) return;
 
         const trace = {
             x: resistanceData.cycles,
@@ -204,14 +205,17 @@ function InternalResistanceVsCyclePlot({ currentSOH, currentCapacity }) {
                 window.Plotly.purge('resistancePlot');
             }
         };
-    }, [resistanceData, markers]);
+    }, [resistanceData, markers, plotlyLoaded]);
 
     useEffect(() => {
         // Load Plotly if not already loaded
-        if (!window.Plotly) {
+        if (window.Plotly) {
+            setPlotlyLoaded(true);
+        } else {
             const script = document.createElement('script');
             script.src = 'https://cdn.plot.ly/plotly-2.35.2.min.js';
             script.async = true;
+            script.onload = () => setPlotlyLoaded(true);
             document.body.appendChild(script);
         }
     }, []);
